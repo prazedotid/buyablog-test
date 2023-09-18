@@ -35,6 +35,7 @@ export async function generateMetadata({params}: PostDetailProps): Promise<Metad
 
   return {
     title: post.title,
+    description: post.description,
   }
 }
 
