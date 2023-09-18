@@ -11,10 +11,11 @@ model Posts {
   id              String   @id @default(auto()) @map("_id") @db.ObjectId
   slug            String   @unique
   title           String
+  description     String
   content         String
   imageUrl        String
-  publicationDate DateTime @db.Date @default(now())
-  authorId        String
+  publicationDate DateTime @default(now()) @db.Date
+  authorId        String   @db.ObjectId
   author          Users    @relation(fields: [authorId], references: [id])
 }
 
