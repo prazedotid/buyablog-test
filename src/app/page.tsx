@@ -14,7 +14,7 @@ export default async function Home() {
 
   return (
     <div>
-      {posts.map((post, index) => (
+      {posts.map((post) => (
         <ArticleCard key={post.id} post={post}/>
       ))}
     </div>

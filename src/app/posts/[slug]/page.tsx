@@ -38,7 +38,7 @@ export async function generateMetadata({params}: PostDetailProps): Promise<Metad
   }
 }
 
-export default async function ({params}: PostDetailProps) {
+export default async function PostDetail({params}: PostDetailProps) {
   const post = await getPost(params.slug)
   if (!post) {
     return notFound()
