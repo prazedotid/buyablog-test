@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client'
-import { default as readingTime } from "reading-time";
+import { default as readingTime } from 'reading-time'
 
 const prismaClientSingleton = () => {
   const prisma = new PrismaClient().$extends({

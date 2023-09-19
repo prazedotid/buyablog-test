@@ -1,7 +1,7 @@
 import React from 'react'
 
 import prisma from '@/lib/prisma'
-import ArticleCard from "@/app/ArticleCard";
+import ArticleCard from '@/components/ArticleCard'
 
 async function getAllPosts() {
   return prisma.posts.findMany({

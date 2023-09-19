@@ -1,6 +1,6 @@
-import Link from "next/link";
-import { DateTime } from "luxon";
-import React from "react";
+import Link from 'next/link'
+import { DateTime } from 'luxon'
+import React from 'react'
 
 interface Props {
   post: {

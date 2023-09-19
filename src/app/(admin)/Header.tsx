@@ -1,6 +1,6 @@
 import Link from 'next/link'
 
-export function Nav() {
+export function Header() {
   return (
     <nav className="mb-10">
       <div className="container mx-auto">

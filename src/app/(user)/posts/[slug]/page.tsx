@@ -3,9 +3,9 @@ import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import React from 'react'
 
-import Facebook from '@/components/share-buttons/facebook'
-import Linkedin from '@/components/share-buttons/linkedin'
-import Twitter from '@/components/share-buttons/twitter'
+import Facebook from '@/components/share-buttons/Facebook'
+import Linkedin from '@/components/share-buttons/Linkedin'
+import Twitter from '@/components/share-buttons/Twitter'
 import prisma from '@/lib/prisma'
 
 interface PostDetailProps {
