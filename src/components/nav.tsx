@@ -2,7 +2,7 @@ import Link from 'next/link'
 
 export function Nav() {
   return (
-    <nav className="mb-12">
+    <nav className="mb-10">
       <div className="container mx-auto">
         <div className="relative flex items-center justify-between h-16">
           <div className="flex-1 flex items-center justify-center sm:items-stretch sm:justify-start">

@@ -7,7 +7,6 @@ import Facebook from '@/components/share-buttons/facebook'
 import Linkedin from '@/components/share-buttons/linkedin'
 import Twitter from '@/components/share-buttons/twitter'
 import prisma from '@/lib/prisma'
-import { Posts } from '@/lib/posts'
 
 interface PostDetailProps {
   params: {
@@ -24,7 +23,7 @@ async function getPost(slug: string) {
     return null
   }
 
-  return new Posts(post)
+  return post
 }
 
 export async function generateMetadata({params}: PostDetailProps): Promise<Metadata> {
@@ -67,7 +66,7 @@ export default async function ({params}: PostDetailProps) {
         <div className='flex flex-column items-center justify-end py-3'>
           <div className='text-sm text-gray-500 mr-3'>Share on</div>
 
-          <Facebook url={'https://github.com/next-share'} className='flex mr-2'/>
+          <Facebook url={'https://github.com/next-share'} className='flex mr-2' quote={post.title}/>
           <Twitter url={'https://github.com/next-share'} className='flex mr-2' title={post.title}/>
           <Linkedin url={'https://github.com/next-share'} className='flex'/>
         </div>
