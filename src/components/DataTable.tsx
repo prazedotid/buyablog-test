@@ -44,27 +44,34 @@ export default function DataTable<T>({fields, data: rows }: DataTableProps<T>) {
   })
 
   return (
-    <table className="min-w-full divide-y divide-gray-200 rounded-lg overflow-hidden">
-      <thead className="bg-gray-50">
-      <tr>
-        {tableFields.map((h, i) => (
-          <th key={i}
-              className="p-4 text-xs font-medium tracking-wider text-left text-gray-500 uppercase dark:text-white">{h.name}</th>
-        ))}
-      </tr>
-      </thead>
-      <tbody className="divide-y divide-gray-200">
-      {rows && rows.map((row, rowIndex) => (
-        <tr key={rowIndex}>
-          {tableFields.map((field, i) => (
-            <td key={i} className="p-4 text-sm text-left text-gray-800">
-              {!field.cell && getProperty(row, field.format, field.selector, rowIndex)}
-              {field.cell && field.cell(row, rowIndex, field)}
-            </td>
+    <div>
+      <table className="min-w-full divide-y divide-gray-200 rounded-lg overflow-hidden mb-6">
+        <thead className="bg-gray-50">
+        <tr>
+          {tableFields.map((h, i) => (
+            <th key={i}
+                className="p-4 text-xs font-medium tracking-wider text-left text-gray-500 uppercase dark:text-white">{h.name}</th>
           ))}
         </tr>
-      ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody className="divide-y divide-gray-200">
+        {rows && rows.length === 0 && (
+          <tr>
+            <td colSpan={tableFields.length} className="text-center py-4 text-gray-800 text-sm">No rows found.</td>
+          </tr>
+        )}
+        {rows && rows.length > 0 && rows.map((row, rowIndex) => (
+          <tr key={rowIndex}>
+            {tableFields.map((field, i) => (
+              <td key={i} className="p-4 text-sm text-left text-gray-800">
+                {!field.cell && getProperty(row, field.format, field.selector, rowIndex)}
+                {field.cell && field.cell(row, rowIndex, field)}
+              </td>
+            ))}
+          </tr>
+        ))}
+        </tbody>
+      </table>
+    </div>
   )
 }

@@ -1,27 +1,26 @@
-import { getCurrentUser } from '@/lib/session'
 import prisma from '@/lib/prisma'
 import { NextRequest, NextResponse } from 'next/server'
-import { Prisma } from '@prisma/client'
 import { DateTime } from 'luxon'
-import PostsWhereInput = Prisma.PostsWhereInput
+import { Prisma } from '.prisma/client'
 
 export async function GET(req: NextRequest) {
   try {
-    const user = await getCurrentUser()
-    if (!user) {
-      return NextResponse.json({error: 'Unauthorized.'}, { status: 403 })
-    }
-
     const { searchParams } = new URL(req.url)
     const reqStatus = searchParams.get('status')
+    const reqAuthorID = searchParams.get('author_id')
     const reqPage = searchParams.get('page')
     const reqLimit = searchParams.get('limit')
 
     const pageIndex = reqPage && !isNaN(Number(reqPage)) ? Number(reqPage) - 1 : 0
     const pageSize = reqLimit && !isNaN(Number(reqLimit)) ? Number(reqLimit) : 10
 
-    let publishedAtFilter: Prisma.DateTimeNullableFilter<"Posts"> | null = {}
-    let NOT: PostsWhereInput = {}
+    let authorIdFilter: Prisma.StringFilter<'Posts'> = {}
+    if (reqAuthorID) {
+      authorIdFilter.equals = reqAuthorID
+    }
+
+    let publishedAtFilter: Prisma.DateTimeNullableFilter<'Posts'> | null = {}
+    let NOT: Prisma.PostsWhereInput = {}
     switch (reqStatus) {
       case 'draft':
         publishedAtFilter = null
@@ -36,7 +35,7 @@ export async function GET(req: NextRequest) {
         break
     }
 
-    const createdAtFilter: Prisma.DateTimeFilter<"Posts"> = {}
+    const createdAtFilter: Prisma.DateTimeFilter<'Posts'> = {}
     const startDate = searchParams.get('start_date')
     const endDate = searchParams.get('end_date')
     if (startDate) {
@@ -48,16 +47,25 @@ export async function GET(req: NextRequest) {
 
     const posts = await prisma.posts.findMany({
       where: {
+        authorId: authorIdFilter,
         createdAt: createdAtFilter,
         publishedAt: publishedAtFilter,
         NOT,
       },
-      take: pageSize,
-      skip: (pageIndex * pageSize),
-      include: {author: {select: {name: true}}},
+      take: pageSize > -1 ? pageSize : undefined,
+      skip: pageSize > -1 ? (pageIndex * pageSize) : undefined,
+      include: { author: { select: { name: true } } },
+    })
+    const total = await prisma.posts.count({
+      where: {
+        authorId: authorIdFilter,
+        createdAt: createdAtFilter,
+        publishedAt: publishedAtFilter,
+        NOT,
+      }
     })
 
-    return NextResponse.json({ data: posts })
+    return NextResponse.json({ data: posts, meta: { total } })
   } catch (error) {
     console.error(error)
     return NextResponse.json({ error }, { status: 500 })
