@@ -5,7 +5,7 @@ import { useMemo, useState } from 'react'
 import useSWR from 'swr'
 
 import DatePicker from '@/components/DatePicker'
-import DataTable, { DataTableField } from '@/components/DataTable'
+import DataTable, { DataTableField } from '@/components/data-table/DataTable'
 import fetcher from '@/lib/swr'
 import ActionCell from './ActionCell'
 import PostStatus from './PostStatus'
@@ -57,26 +57,27 @@ export default function Posts() {
   const [startDateFilter, setStartDateFilter] = useState<Date | null>(null)
   const [endDateFilter, setEndDateFilter] = useState<Date | null>(null)
   const [pageNumber, setPageNumber] = useState(1)
+  const [rowsPerPage, setRowsPerPage] = useState(10)
 
   const postsUrl = useMemo(() => {
-    const paramsObj: Record<string, any> = { page: pageNumber }
+    const paramsObj: Record<string, any> = { page: pageNumber, limit: rowsPerPage }
     if (authorFilter) paramsObj.author_id = authorFilter
     if (statusFilter) paramsObj.status = statusFilter
     if (startDateFilter) paramsObj.start_date = DateTime.fromJSDate(startDateFilter).toFormat('yyyy-MM-dd')
     if (endDateFilter) paramsObj.end_date = DateTime.fromJSDate(endDateFilter).toFormat('yyyy-MM-dd')
 
     return '/api/posts?' + new URLSearchParams(paramsObj).toString()
-  }, [pageNumber, authorFilter, statusFilter, startDateFilter, endDateFilter])
-  const { data: posts } = useSWR<PaginatedData<Post>>(postsUrl, fetcher)
+  }, [pageNumber, rowsPerPage, authorFilter, statusFilter, startDateFilter, endDateFilter])
+  const { data: posts, isLoading } = useSWR<PaginatedData<Post>>(postsUrl, fetcher)
   const { data: users } = useSWR<PaginatedData<User>>('/api/users', fetcher)
 
   return (
     <>
-      <div className="w-full px-6 py-4 bg-white border border-gray-200 rounded-lg shadow-sm">
-        <div className="flex items-center justify-between mb-4">
+      <div className="w-full px-6 py-6 lg:py-4 bg-white border border-gray-200 rounded-lg shadow-sm">
+        <div className="flex items-center justify-between mb-6 lg:mb-4">
           <h3 className="text-xl font-bold leading-none text-gray-900">Manage Posts</h3>
-          <div className="flex items-center relative">
-            <div className="mr-3 w-48">
+          <div className="hidden lg:flex items-center relative">
+            <div className="mr-3 w-36">
               <p className="text-xs uppercase mb-2 font-bold text-gray-500">Author</p>
               <select
                 onChange={(e) => setAuthorFilter(e.target.value)}
@@ -89,7 +90,7 @@ export default function Posts() {
                 ))}
               </select>
             </div>
-            <div className="mr-3 w-48">
+            <div className="mr-3 w-36">
               <p className="text-xs uppercase mb-2 font-bold text-gray-500">Status</p>
               <select
                 onChange={(e) => setStatusFilter(e.target.value)}
@@ -116,7 +117,16 @@ export default function Posts() {
           </div>
         </div>
         <div>
-          {posts && <DataTable fields={fields} data={posts.data}></DataTable>}
+          <DataTable
+            fields={fields}
+            data={posts?.data ?? []}
+            isLoading={isLoading}
+            pagination
+            paginationTotalRows={posts?.meta.total ?? 0}
+            paginationPerPage={rowsPerPage}
+            onPageChange={(page) => setPageNumber(page)}
+            onRowsPerPageChange={(rowsPerPage) => setRowsPerPage(rowsPerPage)}
+          />
         </div>
       </div>
     </>
