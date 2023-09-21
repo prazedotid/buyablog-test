@@ -24,7 +24,7 @@ export default async function RootLayout({
   }
 
   return (
-    <html lang="en" className={'h-full'}>
+    <html lang="en" className={'light h-full'}>
       <body className={inter.className + ' h-full pb-6 bg-gray-50'}>
         <Header/>
         <main className='container mx-auto pt-16'>

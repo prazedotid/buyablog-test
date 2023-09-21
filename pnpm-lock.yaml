@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  '@prazedotid/tailwind-datepicker-react':
+    specifier: 1.5.2
+    version: 1.5.2(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.3.3)
   '@prisma/client':
     specifier: ^5.3.1
     version: 5.3.1(prisma@5.3.1)
@@ -47,6 +50,9 @@ dependencies:
   next-share:
     specifier: ^0.25.0
     version: 0.25.0(react@18.2.0)
+  next-themes:
+    specifier: ^0.2.1
+    version: 0.2.1(next@13.4.19)(react-dom@18.2.0)(react@18.2.0)
   postcss:
     specifier: 8.4.29
     version: 8.4.29
@@ -62,6 +68,9 @@ dependencies:
   reading-time:
     specifier: ^1.5.0
     version: 1.5.0
+  swr:
+    specifier: ^2.2.2
+    version: 2.2.2(react@18.2.0)
   tailwindcss:
     specifier: 3.3.3
     version: 3.3.3
@@ -318,6 +327,19 @@ packages:
 
   /@panva/hkdf@1.1.1:
     resolution: {integrity: sha512-dhPeilub1NuIG0X5Kvhh9lH4iW3ZsHlnzwgwbOlgwQ2wG1IqFzsgHqmKPk3WzsdWAeaxKJxgM0+W433RmN45GA==}
+    dev: false
+
+  /@prazedotid/tailwind-datepicker-react@1.5.2(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.3.3):
+    resolution: {integrity: sha512-bOWUboShh3fTrP2ZH6O5QTAcs6DTN2HRPatVXOqXlU1wl9OMadfdHeYa1fAd95A2ILroxPJTsClyBulCpIiE1g==}
+    peerDependencies:
+      react: '>=17'
+      react-dom: '>=17'
+      tailwindcss: '>=3'
+    dependencies:
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+      tailwind-merge: 1.14.0
+      tailwindcss: 3.3.3
     dev: false
 
   /@prisma/client@5.3.1(prisma@5.3.1):
@@ -2095,6 +2117,18 @@ packages:
       - supports-color
     dev: false
 
+  /next-themes@0.2.1(next@13.4.19)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-B+AKNfYNIzh0vqQQKqQItTS8evEouKD7H5Hj3kmuPERwddR2TxvDSFZuTj6T7Jfn1oyeUyJMydPl1Bkxkh0W7A==}
+    peerDependencies:
+      next: '*'
+      react: '*'
+      react-dom: '*'
+    dependencies:
+      next: 13.4.19(react-dom@18.2.0)(react@18.2.0)
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+    dev: false
+
   /next@13.4.19(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-HuPSzzAbJ1T4BD8e0bs6B9C1kWQ6gv8ykZoRWs5AQoiIuqbGHHdQO7Ljuvg05Q0Z24E2ABozHe6FxDvI6HfyAw==}
     engines: {node: '>=16.8.0'}
@@ -2874,6 +2908,20 @@ packages:
       svg.js: 2.7.1
     dev: false
 
+  /swr@2.2.2(react@18.2.0):
+    resolution: {integrity: sha512-CbR41AoMD4TQBQw9ic3GTXspgfM9Y8Mdhb5Ob4uIKXhWqnRLItwA5fpGvB7SmSw3+zEjb0PdhiEumtUvYoQ+bQ==}
+    peerDependencies:
+      react: ^16.11.0 || ^17.0.0 || ^18.0.0
+    dependencies:
+      client-only: 0.0.1
+      react: 18.2.0
+      use-sync-external-store: 1.2.0(react@18.2.0)
+    dev: false
+
+  /tailwind-merge@1.14.0:
+    resolution: {integrity: sha512-3mFKyCo/MBcgyOTlrY8T7odzZFx+w+qKSMAmdFzRvqBfLlSigU6TZnlFHK0lkMwj9Bj8OYU+9yW9lmGuS0QEnQ==}
+    dev: false
+
   /tailwindcss@3.3.3:
     resolution: {integrity: sha512-A0KgSkef7eE4Mf+nKJ83i75TMyq8HqY3qmFIJSWy8bNt0v1lG7jUcpGpoTFxAwYcWOphcTBLPPJg+bDfhDf52w==}
     engines: {node: '>=14.0.0'}
@@ -3056,6 +3104,14 @@ packages:
     resolution: {integrity: sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==}
     dependencies:
       punycode: 2.3.0
+    dev: false
+
+  /use-sync-external-store@1.2.0(react@18.2.0):
+    resolution: {integrity: sha512-eEgnFxGQ1Ife9bzYs6VLi8/4X6CObHMw9Qr9tPY43iKwsPw8xE8+EFsf/2cFZ5S3esXgpWgtSCtLNS41F+sKPA==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0
+    dependencies:
+      react: 18.2.0
     dev: false
 
   /util-deprecate@1.0.2:

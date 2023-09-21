@@ -1,8 +1,6 @@
 import { ArrowRight } from 'lucide-react'
-import { getServerSession } from 'next-auth'
 import Link from 'next/link'
 
-import { authOptions } from '@/lib/auth'
 import prisma from '@/lib/prisma'
 import VisitorChart from './VisitorChart'
 
@@ -15,7 +13,6 @@ async function getAllPosts() {
 
 export default async function AdminDashboard() {
   const posts = await getAllPosts()
-  const session = await getServerSession(authOptions)
 
   return (
     <>
@@ -24,7 +21,7 @@ export default async function AdminDashboard() {
           <VisitorChart></VisitorChart>
         </div>
         <div className="w-1/3 p-6 bg-white border border-gray-200 rounded-lg shadow-sm">
-          <h3 className="text-xl font-bold leading-none text-gray-900 mb-3">Top posts this month</h3>
+          <h3 className="text-xl font-bold leading-none text-gray-900 mb-3">Top viewed posts this month</h3>
           <ul className="divide-y divide-gray-200 mb-3">
             {posts.map((p, i) => (
               <li key={i} className="py-3">
