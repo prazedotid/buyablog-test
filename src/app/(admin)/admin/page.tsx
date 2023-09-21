@@ -6,7 +6,7 @@ import VisitorChart from './VisitorChart'
 
 async function getAllPosts() {
   return prisma.posts.findMany({
-    include: {author: {select: {name: true}}},
+    include: { author: { select: { name: true } } },
     take: 5,
   })
 }
@@ -27,7 +27,8 @@ export default async function AdminDashboard() {
               <li key={i} className="py-3">
                 <div className="flex items-center justify-between gap-4">
                   <div className="flex items-center min-w-0">
-                    <img src={p.imageUrl} alt="Post image" className="w-10 h-10"/>
+                    {p.imageUrl && <img src={p.imageUrl} alt="Post image" className="w-10 h-10 object-cover"/>}
+                    {!p.imageUrl && <div className="w-10 h-10 bg-gray-200"/>}
                     <div className="ml-3 overflow-hidden">
                       <p className="font-medium text-sm mb-1 text-gray-900 truncate">
                         {p.title}

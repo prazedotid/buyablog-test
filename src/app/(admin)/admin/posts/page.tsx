@@ -16,6 +16,7 @@ interface Post {
   author: {
     name: string
   }
+  views: number
   publishedAt: string
 }
 
@@ -26,19 +27,19 @@ export default function Posts() {
   const [pageIndex, setPageIndex] = useState(1)
 
   const fields: DataTableField<Post>[] = [
-    {name: 'Title', selector: p => p.title},
-    {name: 'Author', selector: p => p.author.name},
-    {name: 'Status', format: p => <PostStatus publishedAt={p.publishedAt}/>},
-    {name: 'Views', selector: p => p.views.toLocaleString()},
+    { name: 'Title', selector: p => p.title },
+    { name: 'Author', selector: p => p.author.name },
+    { name: 'Status', format: p => <PostStatus publishedAt={p.publishedAt}/> },
+    { name: 'Views', selector: p => p.views.toLocaleString() },
     {
       name: 'Publication Date',
       selector: p => p.publishedAt ? DateTime.fromISO(p.publishedAt).toFormat('yyyy-MM-dd') : '-'
     },
-    {name: 'Actions', cell: p => <ActionCell id={p.id}/>}
+    { name: 'Actions', cell: p => <ActionCell id={p.id}/> }
   ]
 
   const postsUrl = useMemo(() => {
-    const paramsObj: Record<string, any> = {page: pageIndex}
+    const paramsObj: Record<string, any> = { page: pageIndex }
     if (statusFilter) {
       paramsObj.status = statusFilter
     }
@@ -51,7 +52,7 @@ export default function Posts() {
 
     return '/api/posts?' + new URLSearchParams(paramsObj).toString()
   }, [pageIndex, statusFilter, startDateFilter, endDateFilter])
-  const {data} = useSWR<{ data: Post[] }>(postsUrl, fetcher)
+  const { data } = useSWR<{ data: Post[] }>(postsUrl, fetcher)
 
   return (
     <>
