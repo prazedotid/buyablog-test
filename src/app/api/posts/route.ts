@@ -3,6 +3,7 @@ import prisma from '@/lib/prisma'
 import { NextRequest, NextResponse } from 'next/server'
 import { Prisma } from '@prisma/client'
 import { DateTime } from 'luxon'
+import PostsWhereInput = Prisma.PostsWhereInput
 
 export async function GET(req: NextRequest) {
   try {
@@ -12,25 +13,44 @@ export async function GET(req: NextRequest) {
     }
 
     const { searchParams } = new URL(req.url)
+    const reqStatus = searchParams.get('status')
     const reqPage = searchParams.get('page')
     const reqLimit = searchParams.get('limit')
 
     const pageIndex = reqPage && !isNaN(Number(reqPage)) ? Number(reqPage) - 1 : 0
     const pageSize = reqLimit && !isNaN(Number(reqLimit)) ? Number(reqLimit) : 10
-    const publishedAtFilter: Prisma.DateTimeFilter = {}
 
+    let publishedAtFilter: Prisma.DateTimeNullableFilter<"Posts"> | null = {}
+    let NOT: PostsWhereInput = {}
+    switch (reqStatus) {
+      case 'draft':
+        publishedAtFilter = null
+        break
+      case 'scheduled':
+        publishedAtFilter = { gt: new Date() }
+        NOT.publishedAt = null
+        break
+      case 'published':
+        publishedAtFilter = { lte: new Date() }
+        NOT.publishedAt = null
+        break
+    }
+
+    const createdAtFilter: Prisma.DateTimeFilter<"Posts"> = {}
     const startDate = searchParams.get('start_date')
     const endDate = searchParams.get('end_date')
     if (startDate) {
-      publishedAtFilter.gte = DateTime.fromFormat(startDate, 'yyyy-MM-dd').toJSDate()
+      createdAtFilter.gte = DateTime.fromFormat(startDate, 'yyyy-MM-dd').toJSDate()
     }
     if (endDate) {
-      publishedAtFilter.lte = DateTime.fromFormat(endDate, 'yyyy-MM-dd').toJSDate()
+      createdAtFilter.lte = DateTime.fromFormat(endDate, 'yyyy-MM-dd').toJSDate()
     }
 
     const posts = await prisma.posts.findMany({
       where: {
+        createdAt: createdAtFilter,
         publishedAt: publishedAtFilter,
+        NOT,
       },
       take: pageSize,
       skip: (pageIndex * pageSize),

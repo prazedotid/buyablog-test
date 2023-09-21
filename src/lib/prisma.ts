@@ -3,7 +3,9 @@ import { default as readingTime } from 'reading-time'
 import slugify from 'slugify'
 
 const prismaClientSingleton = () => {
-  const prisma = new PrismaClient().$extends({
+  const prisma = new PrismaClient()
+
+  prisma.$extends({
     result: {
       posts: {
         readingTime: {
