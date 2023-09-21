@@ -1,7 +1,7 @@
-import Link from "next/link"
-import { TwitterIcon } from "lucide-react"
+import { TwitterIcon } from 'lucide-react'
+import Link from 'next/link'
 
-export function Footer() {
+export default function Footer() {
   return (
     <footer className="flex justify-center mt-24">
       <div className="pt-16 space-y-12">
@@ -18,7 +18,7 @@ export function Footer() {
             aria-label="Twitter"
             className="px-4 text-gray-800 hover:text-blue-500"
           >
-            <TwitterIcon className="w-8 h-8 fill-current" />
+            <TwitterIcon className="w-8 h-8 fill-current"/>
           </a>
         </div>
 
