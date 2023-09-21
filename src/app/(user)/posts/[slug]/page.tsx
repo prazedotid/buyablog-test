@@ -46,7 +46,7 @@ export default async function PostDetail({params}: PostDetailProps) {
 
   return (
     <>
-      <img className="block rounded mb-7 w-full" src={post.imageUrl} alt={'Post Image'}/>
+      {post.imageUrl && <img className="block rounded mb-7 w-full" src={post.imageUrl} alt={'Post Image'}/>}
 
       <h1 className="font-extrabold text-4xl mb-2 leading-tight">{post.title}</h1>
       <h2 className="text-xl mb-7 text-gray-500 leading-7">{post.description}</h2>
@@ -56,7 +56,7 @@ export default async function PostDetail({params}: PostDetailProps) {
         <div>
           <p className="mb-1">{post.author.name}</p>
           <p className="text-gray-500 text-sm">
-            {post.readingTime} &middot; {DateTime.fromJSDate(post.publicationDate).toFormat('MMM dd')}
+            {post.readingTime} &middot; {post.publishedAt && DateTime.fromJSDate(post.publishedAt).toFormat('MMM dd')}
           </p>
         </div>
       </div>

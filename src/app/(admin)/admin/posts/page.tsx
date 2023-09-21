@@ -8,7 +8,7 @@ import DatePicker from '@/components/DatePicker'
 import DataTable, { DataTableField } from '@/components/DataTable'
 import fetcher from '@/lib/swr'
 import ActionCell from './ActionCell'
-import PostStatus from '@/app/(admin)/admin/posts/PostStatus'
+import PostStatus from './PostStatus'
 
 interface Post {
   id: string
@@ -16,7 +16,7 @@ interface Post {
   author: {
     name: string
   }
-  publicationDate: string
+  publishedAt: string
 }
 
 export default function Posts() {
@@ -28,14 +28,17 @@ export default function Posts() {
   const fields: DataTableField<Post>[] = [
     {name: 'Title', selector: p => p.title},
     {name: 'Author', selector: p => p.author.name},
-    {name: 'Status', format: () => <PostStatus status={'published'} />},
-    {name: 'Views', selector: () => 10_000},
-    {name: 'Publication Date', selector: p => DateTime.fromISO(p.publicationDate).toFormat('yyyy-MM-dd') },
-    {name: 'Actions', cell: p => <ActionCell id={p.id} />}
+    {name: 'Status', format: p => <PostStatus publishedAt={p.publishedAt}/>},
+    {name: 'Views', selector: p => p.views.toLocaleString()},
+    {
+      name: 'Publication Date',
+      selector: p => p.publishedAt ? DateTime.fromISO(p.publishedAt).toFormat('yyyy-MM-dd') : '-'
+    },
+    {name: 'Actions', cell: p => <ActionCell id={p.id}/>}
   ]
 
   const postsUrl = useMemo(() => {
-    const paramsObj: Record<string, any> = { page: pageIndex }
+    const paramsObj: Record<string, any> = {page: pageIndex}
     if (statusFilter) {
       paramsObj.status = statusFilter
     }

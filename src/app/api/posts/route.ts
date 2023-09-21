@@ -13,30 +13,33 @@ export async function GET(req: NextRequest) {
 
     const { searchParams } = new URL(req.url)
     const reqPage = searchParams.get('page')
+    const reqLimit = searchParams.get('limit')
 
     const pageIndex = reqPage && !isNaN(Number(reqPage)) ? Number(reqPage) - 1 : 0
-    const publicationDateFilter: Prisma.DateTimeFilter = {}
+    const pageSize = reqLimit && !isNaN(Number(reqLimit)) ? Number(reqLimit) : 10
+    const publishedAtFilter: Prisma.DateTimeFilter = {}
 
     const startDate = searchParams.get('start_date')
     const endDate = searchParams.get('end_date')
     if (startDate) {
-      publicationDateFilter.gte = DateTime.fromFormat(startDate, 'yyyy-MM-dd').toJSDate()
+      publishedAtFilter.gte = DateTime.fromFormat(startDate, 'yyyy-MM-dd').toJSDate()
     }
     if (endDate) {
-      publicationDateFilter.lte = DateTime.fromFormat(endDate, 'yyyy-MM-dd').toJSDate()
+      publishedAtFilter.lte = DateTime.fromFormat(endDate, 'yyyy-MM-dd').toJSDate()
     }
 
     const posts = await prisma.posts.findMany({
       where: {
-        publicationDate: publicationDateFilter,
+        publishedAt: publishedAtFilter,
       },
-      take: 5,
-      skip: (pageIndex * 5),
+      take: pageSize,
+      skip: (pageIndex * pageSize),
       include: {author: {select: {name: true}}},
     })
 
     return NextResponse.json({ data: posts })
   } catch (error) {
+    console.error(error)
     return NextResponse.json({ error }, { status: 500 })
   }
 }

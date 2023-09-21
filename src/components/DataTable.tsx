@@ -54,7 +54,7 @@ export default function DataTable<T>({fields, data: rows }: DataTableProps<T>) {
       </tr>
       </thead>
       <tbody className="divide-y divide-gray-200">
-      {rows.map((row, rowIndex) => (
+      {rows && rows.map((row, rowIndex) => (
         <tr key={rowIndex}>
           {tableFields.map((field, i) => (
             <td key={i} className="p-4 text-sm text-left text-gray-800">

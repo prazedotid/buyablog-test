@@ -7,16 +7,30 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Categories {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  slug        String? @unique
+  name        String
+  description String?
+  Posts       Posts[]
+}
+
 model Posts {
-  id              String   @id @default(auto()) @map("_id") @db.ObjectId
-  slug            String   @unique
-  title           String
-  description     String
-  content         String
-  imageUrl        String
-  publicationDate DateTime @default(now()) @db.Date
-  authorId        String   @db.ObjectId
-  author          Users    @relation(fields: [authorId], references: [id])
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  slug        String?    @unique
+  title       String
+  description String
+  content     String
+  imageUrl    String?
+  authorId    String     @db.ObjectId
+  categoryId  String     @db.ObjectId
+  views       Int        @default(0)
+  publishedAt DateTime?  @default(now()) @db.Date
+  createdAt   DateTime   @default(now()) @db.Date
+  updatedAt   DateTime   @default(now()) @db.Date
+  deletedAt   DateTime?  @db.Date
+  author      Users      @relation(fields: [authorId], references: [id])
+  category    Categories @relation(fields: [categoryId], references: [id])
 }
 
 model Users {

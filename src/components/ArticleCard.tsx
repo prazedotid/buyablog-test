@@ -10,8 +10,8 @@ interface Props {
     author: {
       name: string
     }
-    publicationDate: Date
-    imageUrl: string
+    publishedAt: Date
+    imageUrl?: string
   }
 }
 
@@ -34,7 +34,7 @@ export default function ArticleCard({ post, ...props }: Props) {
             <span className='mr-1'>{post.author.name}</span>
             <span className='mr-1'>&middot;</span>
             <Link href={`/posts/${post.slug}`}>
-              {DateTime.fromJSDate(post.publicationDate).toFormat('MMMM dd, yyyy')}
+              {DateTime.fromJSDate(post.publishedAt).toFormat('MMMM dd, yyyy')}
             </Link>
           </p>
         </div>
