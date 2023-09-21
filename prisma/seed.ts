@@ -3,16 +3,38 @@ import prisma from '../src/lib/prisma'
 import { faker } from '@faker-js/faker'
 
 async function main() {
-  const adminPassword = await hash('admin', 10)
-  const admin = await prisma.users.upsert({
-    where: { username: 'admin' },
-    update: { password: adminPassword },
-    create: {
-      name: 'Administrator',
-      username: 'admin',
-      password: adminPassword,
-    }
-  })
+  const adminPw = await hash('admin', 10)
+  const writerPw = await hash('writer', 10)
+
+  const [admin, admin2, writer] = await Promise.all([
+    prisma.users.upsert({
+      where: { username: 'admin' },
+      update: { password: adminPw },
+      create: {
+        name: 'Administrator',
+        username: 'admin',
+        password: adminPw,
+      }
+    }),
+    prisma.users.upsert({
+      where: { username: 'admin2' },
+      update: { password: adminPw },
+      create: {
+        name: 'Administrator 2',
+        username: 'admin2',
+        password: adminPw,
+      }
+    }),
+    prisma.users.upsert({
+      where: { username: 'writer' },
+      update: { password: writerPw },
+      create: {
+        name: 'Writer A',
+        username: 'writer',
+        password: writerPw,
+      }
+    }),
+  ])
 
   const [seo, tech, popCulture] = await Promise.all([
     prisma.categories.upsert({
@@ -53,7 +75,7 @@ async function main() {
             ? faker.image.urlLoremFlickr({ width: 1280, height: 720 })
             : null,
           publishedAt: faker.datatype.boolean() ? faker.date.anytime() : null,
-          authorId: admin.id,
+          authorId: faker.helpers.arrayElement([admin.id, admin2.id, writer.id]),
           categoryId: faker.helpers.arrayElement([seo.id, tech.id, popCulture.id]),
         },
       })
