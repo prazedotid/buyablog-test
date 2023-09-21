@@ -46,9 +46,12 @@ async function main() {
       return prisma.posts.create({
         data: {
           title: faker.lorem.sentence(),
-          description: faker.lorem.sentences({ min: 1, max: 3}),
-          content: faker.lorem.sentences({ min: 5, max: 20}),
+          description: faker.lorem.sentences({ min: 1, max: 3 }),
+          content: faker.lorem.sentences({ min: 5, max: 20 }),
           views: faker.number.int({ min: 5000, max: 20000 }),
+          imageUrl: faker.datatype.boolean({ probability: 0.9 })
+            ? faker.image.urlLoremFlickr({ width: 1280, height: 720 })
+            : null,
           publishedAt: faker.datatype.boolean() ? faker.date.anytime() : null,
           authorId: admin.id,
           categoryId: faker.helpers.arrayElement([seo.id, tech.id, popCulture.id]),

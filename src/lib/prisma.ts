@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from '.prisma/client'
 import { default as readingTime } from 'reading-time'
 import slugify from 'slugify'
 
