@@ -71,6 +71,7 @@ export async function PUT(
       content: formData.get('content') as string,
       publishedAt: formData.get('published_at') as string,
       imageUrl,
+      categoryId: formData.get('category_id') as string,
       updatedAt: new Date(),
     },
   })

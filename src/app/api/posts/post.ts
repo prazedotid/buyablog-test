@@ -58,7 +58,7 @@ export async function POST(
         content: formData.get('content') as string,
         publishedAt: formData.get('published_at') as string,
         authorId: session.id,
-        categoryId: '650c8da1f3a9cf40dd323fa4',
+        categoryId: formData.get('category_id') as string,
         imageUrl,
       },
     })
