@@ -76,7 +76,7 @@ export async function GET(req: NextRequest) {
     }
 
     // for no search query
-    const findOptions = {
+    const findOptions: Prisma.PostsFindManyArgs = {
       where: {
         authorId: authorIdFilter,
         createdAt: createdAtFilter,
@@ -86,6 +86,7 @@ export async function GET(req: NextRequest) {
       take: pageSize > -1 ? pageSize : undefined,
       skip: pageSize > -1 ? (pageIndex * pageSize) : undefined,
       include: { author: { select: { name: true } } },
+      orderBy: [{ createdAt: 'desc' }],
     }
 
     const posts = reqSearch

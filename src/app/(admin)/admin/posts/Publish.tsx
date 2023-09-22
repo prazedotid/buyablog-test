@@ -1,4 +1,5 @@
 import { Menu, Transition } from '@headlessui/react'
+import clsx from 'clsx'
 import { ChevronDownIcon } from 'lucide-react'
 import { Fragment } from 'react'
 
@@ -7,20 +8,26 @@ interface Props {
   onSaveAsDraft: () => void
   onSchedulePublish: () => void
   onClearAll: () => void
+  isReadyToPublish: boolean
 }
 
-export default function Publish({ onClearAll, onSaveAsDraft, onSchedulePublish, onPublish }: Props) {
+export default function Publish({ onClearAll, onSaveAsDraft, onSchedulePublish, onPublish, isReadyToPublish }: Props) {
+  const publishButtonCls = clsx('px-5 py-3 text-sm bg-blue-100 rounded-bl rounded-tl text-blue-800 font-medium', !isReadyToPublish ? 'opacity-50' : 'hover:bg-blue-200')
+  const scheduleButtonCls = clsx(`group flex w-full items-center rounded-md px-2 py-2 text-sm`, !isReadyToPublish && 'opacity-50')
+
   return (
     <div className="flex items-center">
       <button
         onClick={onPublish}
-        className="px-5 py-3 text-sm bg-blue-100 rounded-bl rounded-tl hover:bg-blue-200 text-blue-800 font-medium"
+        disabled={!isReadyToPublish}
+        className={publishButtonCls}
       >
         Publish
       </button>
       <Menu as="div" className="relative inline-block">
         <Menu.Button
-          className="px-3 py-4 text-sm bg-blue-100 rounded-br rounded-tr hover:bg-blue-200 text-blue-800 border-l border-blue-200 font-medium">
+          className="px-3 py-4 text-sm bg-blue-100 rounded-br rounded-tr hover:bg-blue-200 text-blue-800 border-l border-blue-200 font-medium"
+        >
           <ChevronDownIcon size={12}/>
         </Menu.Button>
         <Transition
@@ -50,12 +57,11 @@ export default function Publish({ onClearAll, onSaveAsDraft, onSchedulePublish, 
               <Menu.Item>
                 {({ active }) => (
                   <button
-                    className={`${
-                      active ? 'bg-gray-100' : 'text-gray-900'
-                    } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                    className={clsx(active && isReadyToPublish ? 'bg-gray-100' : 'text-gray-900', scheduleButtonCls)}
+                    disabled={!isReadyToPublish}
                     onClick={onSchedulePublish}
                   >
-                    Set publish schedule
+                    Schedule for later
                   </button>
                 )}
               </Menu.Item>
