@@ -72,7 +72,7 @@ export default async function PostDetail({params}: PostDetailProps) {
         <div className="w-full h-px bg-gray-200"></div>
       </div>
 
-      <div className="text-gray-600">
+      <div className="text-gray-600 whitespace-pre-wrap">
         {post.content}
       </div>
     </>

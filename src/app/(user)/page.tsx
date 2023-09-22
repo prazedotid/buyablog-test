@@ -3,11 +3,12 @@
 import React from 'react'
 
 import { useSearchParams } from 'next/navigation'
+import useSWRInfinite from 'swr/infinite'
+import { MaximizeIcon } from 'lucide-react'
+
 import { PaginatedData } from '@/lib/types'
 import { fetcherData } from '@/lib/swr'
-
 import ArticleCard from './ArticleCard'
-import useSWRInfinite from 'swr/infinite'
 
 interface Post {
   id: string
@@ -28,7 +29,7 @@ interface Post {
 
 export default function Home() {
   const searchParams = useSearchParams()
-  const rowsPerPage = 5
+  const rowsPerPage = 8
 
   const postsUrl = (pageIndex: number, previousPageData: Array<PaginatedData<Post>>) => {
     if (previousPageData && !previousPageData.length) return null
@@ -54,6 +55,14 @@ export default function Home() {
 
   return (
     <>
+      {posts.length === 0 && !isLoadingMore && (
+        <div className="flex items-center">
+          <div className="flex flex-col text-gray-500 items-center mx-auto py-24">
+            <MaximizeIcon size={60} />
+            <p className="mt-4 text-xl">No posts found</p>
+          </div>
+        </div>
+      )}
       {posts.map((post) => <ArticleCard key={post.id} post={post}/>)}
 
       {!isReachingEnd && (
