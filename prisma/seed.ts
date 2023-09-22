@@ -69,7 +69,7 @@ async function main() {
         data: {
           title: faker.lorem.sentence(),
           description: faker.lorem.sentences({ min: 1, max: 3 }),
-          content: faker.lorem.sentences({ min: 5, max: 20 }),
+          content: faker.lorem.paragraphs({ min: 3, max: 8 }),
           views: faker.number.int({ min: 5000, max: 20000 }),
           imageUrl: faker.datatype.boolean({ probability: 0.9 })
             ? faker.image.urlLoremFlickr({ width: 512, height: 512, category: 'nature' })
