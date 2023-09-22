@@ -25,10 +25,10 @@ export default async function RootLayout({
 
   return (
     <html lang="en" className={'light h-full'}>
-      <body className={inter.className + ' h-full pb-6 bg-gray-50'}>
+      <body className={inter.className + ' h-full pb-6 bg-white'}>
         <Header/>
         <main className='container mx-auto pt-16'>
-          <div className='pt-6'>
+          <div className='py-6'>
             {children}
           </div>
         </main>

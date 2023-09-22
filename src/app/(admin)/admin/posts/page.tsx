@@ -3,6 +3,8 @@
 import { DateTime } from 'luxon'
 import { useMemo, useState } from 'react'
 import useSWR from 'swr'
+import { PlusIcon } from 'lucide-react'
+import Link from 'next/link'
 
 import DatePicker from '@/components/DatePicker'
 import DataTable, { DataTableField } from '@/components/data-table/DataTable'
@@ -80,75 +82,82 @@ export default function Posts() {
   const { data: users } = useSWR<PaginatedData<User>>('/api/users', fetcher)
 
   return (
-    <>
-      <div className="w-full py-2">
-        <h3 className="text-3xl font-bold leading-none text-gray-900 mb-8">Manage Posts</h3>
-        <div className="bg-white border border-gray-200">
-          <div className="flex items-center justify-between py-4 px-4">
-            <div className="flex-1 mr-3">
-              <p className="text-xs uppercase mb-2 font-bold text-gray-500">Search</p>
-              <input
-                type="text"
-                placeholder="Search by title..."
-                value={searchFilter}
-                onChange={(e) => handleSearch(e.target.value)}
+    <div className="w-full py-2">
+      <div className="flex items-center justify-between mb-8">
+        <h3 className="text-3xl font-bold leading-none text-gray-900">Manage Posts</h3>
+        <Link
+          href="/admin/posts/create"
+          className="flex items-center gap-4 px-4 py-2 bg-blue-500 text-sm text-white uppercase font-bold rounded"
+        >
+          <PlusIcon/>
+          <span>Create New Post</span>
+        </Link>
+      </div>
+      <div className="bg-white border border-gray-200">
+        <div className="flex items-center justify-between py-4 px-4">
+          <div className="flex-1 mr-3">
+            <p className="text-xs uppercase mb-2 font-bold text-gray-500">Search</p>
+            <input
+              type="text"
+              placeholder="Search by title..."
+              value={searchFilter}
+              onChange={(e) => handleSearch(e.target.value)}
+              className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
+            />
+          </div>
+          <div className="flex items-center relative">
+            <div className="mr-3 w-36">
+              <p className="text-xs uppercase mb-2 font-bold text-gray-500">Author</p>
+              <select
+                onChange={(e) => setAuthorFilter(e.target.value)}
+                value={authorFilter}
                 className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
-              />
+              >
+                <option value="">All</option>
+                {users && users.data.map(u => (
+                  <option key={u.id} value={u.id}>{u.name}</option>
+                ))}
+              </select>
             </div>
-            <div className="flex items-center relative">
-              <div className="mr-3 w-36">
-                <p className="text-xs uppercase mb-2 font-bold text-gray-500">Author</p>
-                <select
-                  onChange={(e) => setAuthorFilter(e.target.value)}
-                  value={authorFilter}
-                  className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
-                >
-                  <option value="">All</option>
-                  {users && users.data.map(u => (
-                    <option key={u.id} value={u.id}>{u.name}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="mr-3 w-36">
-                <p className="text-xs uppercase mb-2 font-bold text-gray-500">Status</p>
-                <select
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                  value={statusFilter}
-                  className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
-                >
-                  <option value="">All</option>
-                  <option value="draft">Draft</option>
-                  <option value="scheduled">Scheduled</option>
-                  <option value="published">Published</option>
-                </select>
-              </div>
-              <div>
-                <p className="text-xs uppercase mb-2 font-bold text-gray-500">Creation Date</p>
-                <div className="flex items-center">
-                  <div className="mr-3 w-48">
-                    <DatePicker onChange={setStartDateFilter} placeholder="Start Date"/>
-                  </div>
-                  <div className="mr-3 w-48">
-                    <DatePicker onChange={setEndDateFilter} placeholder="End Date"/>
-                  </div>
+            <div className="mr-3 w-36">
+              <p className="text-xs uppercase mb-2 font-bold text-gray-500">Status</p>
+              <select
+                onChange={(e) => setStatusFilter(e.target.value)}
+                value={statusFilter}
+                className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
+              >
+                <option value="">All</option>
+                <option value="draft">Draft</option>
+                <option value="scheduled">Scheduled</option>
+                <option value="published">Published</option>
+              </select>
+            </div>
+            <div>
+              <p className="text-xs uppercase mb-2 font-bold text-gray-500">Creation Date</p>
+              <div className="flex items-center">
+                <div className="mr-3 w-48">
+                  <DatePicker onChange={setStartDateFilter} placeholder="Start Date"/>
+                </div>
+                <div className="mr-3 w-48">
+                  <DatePicker onChange={setEndDateFilter} placeholder="End Date"/>
                 </div>
               </div>
             </div>
           </div>
-          <div>
-            <DataTable
-              fields={fields}
-              data={posts?.data ?? []}
-              isLoading={isLoading}
-              pagination
-              paginationTotalRows={posts?.meta.total ?? 0}
-              paginationPerPage={rowsPerPage}
-              onPageChange={(page) => setPageNumber(page)}
-              onRowsPerPageChange={(rowsPerPage) => setRowsPerPage(rowsPerPage)}
-            />
-          </div>
+        </div>
+        <div>
+          <DataTable
+            fields={fields}
+            data={posts?.data ?? []}
+            isLoading={isLoading}
+            pagination
+            paginationTotalRows={posts?.meta.total ?? 0}
+            paginationPerPage={rowsPerPage}
+            onPageChange={(page) => setPageNumber(page)}
+            onRowsPerPageChange={(rowsPerPage) => setRowsPerPage(rowsPerPage)}
+          />
         </div>
       </div>
-    </>
+    </div>
   )
 }
