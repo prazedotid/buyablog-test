@@ -1,6 +1,6 @@
 'use client'
 
-import clsx from 'clsx'
+import { clsx } from 'clsx'
 import { DateTime } from 'luxon'
 import { useMemo, useState } from 'react'
 import useSWR from 'swr'

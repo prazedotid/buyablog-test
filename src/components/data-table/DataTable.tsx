@@ -1,6 +1,6 @@
 'use client'
 
-import clsx from 'clsx'
+import { clsx } from 'clsx'
 import { ReactNode, useState } from 'react'
 
 import Pagination from '@/components/data-table/Pagination'

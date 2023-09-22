@@ -1,6 +1,6 @@
 'use client'
 
-import clsx from 'clsx'
+import { clsx } from 'clsx'
 import Link from 'next/link'
 import { ChevronLeftIcon, PlusIcon, TrashIcon } from 'lucide-react'
 import TextareaAutosize from 'react-textarea-autosize'

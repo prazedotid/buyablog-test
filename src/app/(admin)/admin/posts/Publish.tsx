@@ -1,5 +1,5 @@
 import { Menu, Transition } from '@headlessui/react'
-import clsx from 'clsx'
+import { clsx } from 'clsx'
 import { ChevronDownIcon } from 'lucide-react'
 import { Fragment } from 'react'
 
