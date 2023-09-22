@@ -32,7 +32,7 @@ export default function Pagination(props: PaginationProps) {
   const greaterButtonCls = clsx('rounded-full p-3', isGreaterDisabled ? 'text-gray-300' : 'text-gray-800 hover:bg-gray-100')
 
   return (
-    <div className="flex items-center justify-end">
+    <div className="flex items-center justify-end mb-3 mr-3">
       <div className="text-sm mr-2 text-gray-800">
         Rows per page:
       </div>

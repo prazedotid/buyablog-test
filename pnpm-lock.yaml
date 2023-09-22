@@ -5,14 +5,11 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
-  .prisma/client:
-    specifier: link:prisma/prisma-client
-    version: link:prisma/prisma-client
   '@prazedotid/tailwind-datepicker-react':
     specifier: 1.5.2
     version: 1.5.2(react-dom@18.2.0)(react@18.2.0)(tailwindcss@3.3.3)
   '@prisma/client':
-    specifier: ^5.3.1
+    specifier: 5.3.1
     version: 5.3.1(prisma@5.3.1)
   '@types/react':
     specifier: 18.2.21

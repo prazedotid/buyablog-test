@@ -1,11 +1,12 @@
 import prisma from '@/lib/prisma'
 import { NextRequest, NextResponse } from 'next/server'
 import { DateTime } from 'luxon'
-import { Prisma } from '.prisma/client'
+import { Prisma } from '@prisma/client'
 
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url)
+    const reqSearch = searchParams.get('search')
     const reqStatus = searchParams.get('status')
     const reqAuthorID = searchParams.get('author_id')
     const reqPage = searchParams.get('page')
@@ -45,7 +46,37 @@ export async function GET(req: NextRequest) {
       createdAtFilter.lte = DateTime.fromFormat(endDate, 'yyyy-MM-dd').toJSDate()
     }
 
-    const posts = await prisma.posts.findMany({
+    // for search query
+    const rawAggregatePipeline: Prisma.InputJsonValue[] = [
+      { $match: { $text: { $search: reqSearch } } },
+      { $lookup: { from: 'Users', localField: 'authorId', foreignField: '_id', as: 'author' } },
+      { $unwind: '$author' },
+      {
+        $project: {
+          _id: 0,
+          id: { $toString: '$_id' },
+          slug: 1,
+          title: 1,
+          description: 1,
+          content: 1,
+          imageUrl: 1,
+          authorId: { $toString: '$authorId' },
+          categoryId: { $toString: '$categoryId' },
+          views: 1,
+          publishedAt: { $dateToString: { date: '$publishedAt' } },
+          createdAt: { $dateToString: { date: '$createdAt' } },
+          updatedAt: { $dateToString: { date: '$updatedAt' } },
+          deletedAt: { $dateToString: { date: '$deletedAt' } },
+          author: { name: 1 },
+        },
+      },
+    ]
+    if (pageSize > -1) {
+      rawAggregatePipeline.push({ $limit: pageSize }, { $skip: (pageIndex * pageSize) })
+    }
+
+    // for no search query
+    const findOptions = {
       where: {
         authorId: authorIdFilter,
         createdAt: createdAtFilter,
@@ -55,15 +86,30 @@ export async function GET(req: NextRequest) {
       take: pageSize > -1 ? pageSize : undefined,
       skip: pageSize > -1 ? (pageIndex * pageSize) : undefined,
       include: { author: { select: { name: true } } },
-    })
-    const total = await prisma.posts.count({
-      where: {
-        authorId: authorIdFilter,
-        createdAt: createdAtFilter,
-        publishedAt: publishedAtFilter,
-        NOT,
-      }
-    })
+    }
+
+    const posts = reqSearch
+      ? await prisma.posts.aggregateRaw({ pipeline: rawAggregatePipeline })
+      : await prisma.posts.findMany(findOptions)
+    const total = reqSearch
+      ? (
+        (
+          await prisma.posts.aggregateRaw({
+            pipeline: [
+              { $match: { $text: { $search: reqSearch } } },
+              { $count: 'total' },
+            ],
+          })
+        )[0] as Prisma.JsonObject
+      ).total
+      : await prisma.posts.count({
+          where: {
+            authorId: authorIdFilter,
+            createdAt: createdAtFilter,
+            publishedAt: publishedAtFilter,
+            NOT,
+          }
+        })
 
     return NextResponse.json({ data: posts, meta: { total } })
   } catch (error) {
