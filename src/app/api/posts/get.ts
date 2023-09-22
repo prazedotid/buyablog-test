@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Prisma } from '@prisma/client'
-import { DateTime } from 'luxon'
 import prisma from '@/lib/prisma'
 import { getCurrentUser } from '@/lib/session'
 
