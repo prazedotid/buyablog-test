@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
 
     // params
     const reqSearch = searchParams.get('search')
-    const reqStatus = searchParams.get('status') || 'published'
+    const reqStatus = searchParams.get('status')
     const reqSort = searchParams.get('sort')
     const reqCategoryID = searchParams.get('category_id')
     const reqAuthorID = searchParams.get('author_id')
@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
     const pageSize = reqLimit && !isNaN(Number(reqLimit)) ? Number(reqLimit) : 10
 
     // non-authenticated users can only see published posts
-    let needsAuth = !reqStatus || reqStatus !== 'published'
+    let needsAuth = reqStatus !== 'published'
     if (needsAuth) {
       const session = await getCurrentUser()
       if (!session) {
@@ -31,9 +31,8 @@ export async function GET(req: NextRequest) {
     }
 
     // for lookup with full text search
-    const matchCriteria: Record<string, any> = {}
+    const matchCriteria: Record<string, any> = { $expr: {} }
     if (pubStartDate || pubEndDate || reqStatus) {
-      matchCriteria.$expr = {}
       if (reqStatus === 'draft') {
         matchCriteria.publishedAt = { ...matchCriteria.publishedAt, $eq: null }
       } else {
@@ -46,8 +45,8 @@ export async function GET(req: NextRequest) {
       if (pubEndDate) matchCriteria.publishedAt.$lte = { $date: new Date(pubEndDate) }
     }
     if (reqSearch) matchCriteria.$text = { $search: reqSearch }
-    if (reqCategoryID) matchCriteria.categoryId = reqCategoryID
-    if (reqAuthorID) matchCriteria.authorId = reqAuthorID
+    if (reqCategoryID) matchCriteria.categoryId = { $oid: reqCategoryID }
+    if (reqAuthorID) matchCriteria.authorId = { $oid: reqAuthorID }
 
     const rawAggregatePipeline: Prisma.InputJsonValue[] = [
       { $match: matchCriteria },
