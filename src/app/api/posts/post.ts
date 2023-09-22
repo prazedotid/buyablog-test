@@ -34,33 +34,38 @@ export const uploadFile = async ({ file, bucketName }: { file: File, bucketName:
 export async function POST(
   req: NextRequest,
 ) {
-  const session = await getCurrentUser()
-  if (!session) {
-    return NextResponse.json('Unauthorized.', { status: 401 })
-  }
+  try {
+    const session = await getCurrentUser()
+    if (!session) {
+      return NextResponse.json('Unauthorized.', { status: 401 })
+    }
 
-  const formData = await req.formData()
-  let imageUrl: string = ''
+    const formData = await req.formData()
+    let imageUrl: string | null = null
 
-  if (formData.has('image')) {
-    const uploadToS3 = await uploadFile({
-      file: formData.get('image') as File,
-      bucketName: 'buyablog-post-images',
+    if (formData.has('image')) {
+      const uploadToS3 = await uploadFile({
+        file: formData.get('image') as File,
+        bucketName: 'buyablog-post-images',
+      })
+      imageUrl = uploadToS3.Location as string
+    }
+
+    await prisma.posts.create({
+      data: {
+        title: formData.get('title') as string,
+        description: formData.get('description') as string,
+        content: formData.get('content') as string,
+        publishedAt: formData.get('published_at') as string,
+        authorId: session.id,
+        categoryId: '650c8da1f3a9cf40dd323fa4',
+        imageUrl,
+      },
     })
-    imageUrl = uploadToS3.Location as string
+
+    return NextResponse.json({ success: true }, { status: 201 })
+  } catch (error) {
+    console.error(error)
+    return NextResponse.json({ error }, { status: 500 })
   }
-
-  await prisma.posts.create({
-    data: {
-      title: formData.get('title') as string,
-      description: formData.get('description') as string,
-      content: formData.get('content') as string,
-      publishedAt: formData.get('published_at') as string,
-      authorId: session.id,
-      categoryId: '650c8da1f3a9cf40dd323fa4',
-      imageUrl,
-    },
-  })
-
-  return NextResponse.json({ success: true }, { status: 201 })
 }

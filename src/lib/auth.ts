@@ -50,13 +50,17 @@ export const authOptions: NextAuthOptions = {
           throw new Error('Invalid password.')
         }
 
-        return user
+        return {
+          id: user.id,
+          username: user.username,
+          name: user.name,
+        }
       },
     })
   ],
   callbacks: {
     jwt: async ({ token, user }) => {
-      if (user && token.user) token.user.id = user.id
+      if (user) token.user = user
       return token
     },
     session: async ({ session, token }) => {
