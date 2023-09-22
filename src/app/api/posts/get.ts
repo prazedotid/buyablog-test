@@ -86,7 +86,7 @@ export async function GET(req: NextRequest) {
       if (Object.keys(sortObj).length > 0) rawAggregatePipeline.push({ $sort: sortObj })
     }
     if (pageSize > -1) {
-      rawAggregatePipeline.push({ $limit: pageSize }, { $skip: (pageIndex * pageSize) })
+      rawAggregatePipeline.push({ $limit: (pageIndex * pageSize) + pageSize }, { $skip: (pageIndex * pageSize) })
     }
 
     const posts = await prisma.posts.aggregateRaw({ pipeline: rawAggregatePipeline })
