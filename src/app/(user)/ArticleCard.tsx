@@ -10,6 +10,9 @@ interface Props {
     author: {
       name: string
     }
+    category: {
+      name: string
+    }
     publishedAt: Date | null
     imageUrl: string | null
   }
@@ -19,11 +22,11 @@ export default function ArticleCard({ post, ...props }: Props) {
   return (
     <article className="py-4 border-b" {...props}>
       <div className="flex flex-column gap-2 mb-1.5">
-        <div className="text-xs text-pink-500 font-bold">Category name</div>
+        <div className="text-xs text-pink-500 font-bold">{post.category.name}</div>
       </div>
 
-      <div className="flex flex-column gap-8">
-        <div>
+      <div className="flex flex-column justify-between">
+        <div className="flex-1 pr-4">
           <Link href={`/posts/${post.slug}`}>
             <h1 className="text-gray-800 mb-1 text-lg font-bold tracking-tight leading-normal">
               {post.title}
@@ -38,8 +41,8 @@ export default function ArticleCard({ post, ...props }: Props) {
             </Link>}
           </p>
         </div>
-        {post.imageUrl && <Link href={`/posts/${post.slug}`}>
-            <img className="w-32 h-28 rounded object-cover" src={post.imageUrl} alt="Post Image"/>
+        {post.imageUrl && <Link href={`/posts/${post.slug}`} className="w-28">
+            <img className="w-full h-full rounded object-cover block" src={post.imageUrl} alt="Post Image"/>
         </Link>}
       </div>
     </article>

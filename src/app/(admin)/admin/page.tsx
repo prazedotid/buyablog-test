@@ -4,15 +4,16 @@ import Link from 'next/link'
 import prisma from '@/lib/prisma'
 import VisitorChart from './VisitorChart'
 
-async function getAllPosts() {
+async function getTopViewedPosts() {
   return prisma.posts.findMany({
     include: { author: { select: { name: true } } },
+    orderBy: [{ views: 'desc' }],
     take: 5,
   })
 }
 
 export default async function AdminDashboard() {
-  const posts = await getAllPosts()
+  const posts = await getTopViewedPosts()
 
   return (
     <>
@@ -39,7 +40,7 @@ export default async function AdminDashboard() {
                     </div>
                   </div>
                   <div className="inline-flex items-center text-base font-semibold text-gray-900">
-                    1,000
+                    {p.views.toLocaleString()}
                   </div>
                 </div>
               </li>

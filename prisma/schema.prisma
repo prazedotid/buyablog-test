@@ -1,6 +1,7 @@
 generator client {
   provider = "prisma-client-js"
   output   = "./prisma-client"
+  previewFeatures = ["fullTextIndex"]
 }
 
 datasource db {
@@ -32,6 +33,8 @@ model Posts {
   deletedAt   DateTime?  @db.Date
   author      Users      @relation(fields: [authorId], references: [id])
   category    Categories @relation(fields: [categoryId], references: [id])
+
+  @@fulltext([title, description, content])
 }
 
 model Users {

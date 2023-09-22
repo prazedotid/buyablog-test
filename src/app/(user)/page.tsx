@@ -1,16 +1,27 @@
 import React from 'react'
 
 import prisma from '@/lib/prisma'
-import ArticleCard from '@/components/ArticleCard'
+import ArticleCard from './ArticleCard'
 
-async function getAllPosts() {
+async function getAllPublishedPosts() {
   return prisma.posts.findMany({
-    include: {author: {select: {name: true}}},
+    where: {
+      publishedAt: {
+        lt: new Date(),
+      },
+      NOT: {
+        publishedAt: null,
+      }
+    },
+    include: {
+      author: {select: {name: true}},
+      category: {select: {name: true}},
+    },
   })
 }
 
 export default async function Home() {
-  const posts = await getAllPosts()
+  const posts = await getAllPublishedPosts()
 
   return (
     <div>

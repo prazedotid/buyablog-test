@@ -7,6 +7,7 @@ import Facebook from '@/components/share-buttons/Facebook'
 import Linkedin from '@/components/share-buttons/Linkedin'
 import Twitter from '@/components/share-buttons/Twitter'
 import prisma from '@/lib/prisma'
+import { mediumReadingTime } from '@/lib/util'
 
 interface PostDetailProps {
   params: {
@@ -56,7 +57,7 @@ export default async function PostDetail({params}: PostDetailProps) {
         <div>
           <p className="mb-1">{post.author.name}</p>
           <p className="text-gray-500 text-sm">
-            {post.readingTime} &middot; {post.publishedAt && DateTime.fromJSDate(post.publishedAt).toFormat('MMM dd')}
+            {mediumReadingTime(post.content)} &middot; {post.publishedAt && DateTime.fromJSDate(post.publishedAt).toFormat('MMM dd')}
           </p>
         </div>
       </div>

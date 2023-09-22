@@ -1,12 +1,7 @@
-import { useEffect, useState } from 'react'
+import { default as readingTime } from 'reading-time'
 
 export const noop = () => null
 
-export default function useDebounce<T>(value: T, delay: number = 500): T {
-  const [debouncedValue, setDebouncedValue] = useState<T>(value);
-  useEffect(() => {
-    const timer = setTimeout(() => setDebouncedValue(value), delay);
-    return () => clearTimeout(timer);
-  }, [value, delay]);
-  return debouncedValue;
+export function mediumReadingTime(content: string) {
+  return Math.ceil(readingTime(content).minutes) + ' min read'
 }

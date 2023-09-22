@@ -72,7 +72,7 @@ async function main() {
           content: faker.lorem.sentences({ min: 5, max: 20 }),
           views: faker.number.int({ min: 5000, max: 20000 }),
           imageUrl: faker.datatype.boolean({ probability: 0.9 })
-            ? faker.image.urlLoremFlickr({ width: 1280, height: 720 })
+            ? faker.image.urlLoremFlickr({ width: 512, height: 512, category: 'nature' })
             : null,
           publishedAt: faker.datatype.boolean() ? faker.date.anytime() : null,
           authorId: faker.helpers.arrayElement([admin.id, admin2.id, writer.id]),

@@ -6,8 +6,8 @@ import useSWR from 'swr'
 
 import DatePicker from '@/components/DatePicker'
 import DataTable, { DataTableField } from '@/components/data-table/DataTable'
+import useDebounce from '@/hooks/useDebounce'
 import fetcher from '@/lib/swr'
-import useDebounce from '@/lib/util'
 import ActionCell from './ActionCell'
 import PostStatus from './PostStatus'
 
@@ -86,7 +86,7 @@ export default function Posts() {
         <div className="bg-white border border-gray-200">
           <div className="flex items-center justify-between py-4 px-4">
             <div className="flex-1 mr-3">
-              <p className="text-xs uppercase mb-2 font-bold text-gray-500">Title</p>
+              <p className="text-xs uppercase mb-2 font-bold text-gray-500">Search</p>
               <input
                 type="text"
                 placeholder="Search by title..."
