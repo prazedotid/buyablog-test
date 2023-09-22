@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { TwitterIcon } from 'lucide-react'
+import { MailsIcon } from 'lucide-react'
 
 export default function Footer() {
   return (
@@ -13,12 +13,12 @@ export default function Footer() {
         <div className="flex items-center justify-center">
           <a
             target="_blank"
-            href="https://twitter.com/nextjs"
+            href="mailto:galihpras33@gmail.com"
             rel="noopener noreferrer"
             aria-label="Twitter"
             className="px-4 text-gray-800 hover:text-blue-500"
           >
-            <TwitterIcon className="w-8 h-8 fill-current"/>
+            <MailsIcon className="w-8 h-8"/>
           </a>
         </div>
 
