@@ -3,11 +3,9 @@ import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import React from 'react'
 
-import Facebook from '@/components/share-buttons/Facebook'
-import Linkedin from '@/components/share-buttons/Linkedin'
-import Twitter from '@/components/share-buttons/Twitter'
 import prisma from '@/lib/prisma'
 import { mediumReadingTime } from '@/lib/util'
+import SocialShare from './SocialShare'
 
 interface PostDetailProps {
   params: {
@@ -64,13 +62,7 @@ export default async function PostDetail({params}: PostDetailProps) {
 
       <div id="socials" className="mb-7">
         <div className="w-full h-px bg-gray-200"></div>
-        <div className="flex flex-column items-center justify-end py-3">
-          <div className="text-sm text-gray-500 mr-3">Share on</div>
-
-          <Facebook url={'https://github.com/next-share'} className="flex mr-2" quote={post.title}/>
-          <Twitter url={'https://github.com/next-share'} className="flex mr-2" title={post.title}/>
-          <Linkedin url={'https://github.com/next-share'} className="flex"/>
-        </div>
+        <SocialShare title={post.title} />
         <div className="w-full h-px bg-gray-200"></div>
       </div>
 
