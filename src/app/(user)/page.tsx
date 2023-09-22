@@ -37,6 +37,7 @@ export default function Home() {
       status: 'published',
       limit: rowsPerPage,
       page: pageIndex + 1,
+      sort: 'publishedAt:desc',
     }
     if (searchParams.has('search')) paramsObj.search = searchParams.get('search')
 

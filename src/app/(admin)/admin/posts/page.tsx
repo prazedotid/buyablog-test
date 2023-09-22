@@ -92,13 +92,13 @@ export default function Posts() {
   const debouncedSearch = useDebounce(searchFilter)
 
   const postsUrl = useMemo(() => {
-    const paramsObj: Record<string, any> = { page: pageNumber, limit: rowsPerPage }
+    const paramsObj: Record<string, any> = { page: pageNumber, limit: rowsPerPage, sort: 'createdAt:desc' }
     if (debouncedSearch) paramsObj.search = debouncedSearch
     if (categoryFilter) paramsObj.category_id = categoryFilter
     if (authorFilter) paramsObj.author_id = authorFilter
     if (statusFilter) paramsObj.status = statusFilter
-    if (startDateFilter) paramsObj.start_date = DateTime.fromJSDate(startDateFilter).toFormat('yyyy-MM-dd')
-    if (endDateFilter) paramsObj.end_date = DateTime.fromJSDate(endDateFilter).toFormat('yyyy-MM-dd')
+    if (startDateFilter) paramsObj.published_from = DateTime.fromJSDate(startDateFilter).toFormat('yyyy-MM-dd')
+    if (endDateFilter) paramsObj.published_until = DateTime.fromJSDate(endDateFilter).toFormat('yyyy-MM-dd')
 
     return '/api/posts?' + new URLSearchParams(paramsObj).toString()
   }, [pageNumber, rowsPerPage, debouncedSearch, categoryFilter, authorFilter, statusFilter, startDateFilter, endDateFilter])
@@ -189,7 +189,7 @@ export default function Posts() {
                 </select>
               </div>
               <div>
-                <p className="text-xs uppercase mb-2 font-bold text-gray-500">Creation Date</p>
+                <p className="text-xs uppercase mb-2 font-bold text-gray-500">Publication Date</p>
                 <div className="flex items-center">
                   <div className="mr-3 w-48">
                     <DatePicker onChange={setStartDateFilter} placeholder="Start Date"/>
