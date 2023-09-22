@@ -136,7 +136,7 @@ export default function VisitorChart() {
           <h3 className="text-base font-light text-gray-500">visitors this month</h3>
         </div>
       </div>
-      <Chart options={chart} series={chart.series} type="area" className={'w-full'} height={335}></Chart>
+      {typeof window !== 'undefined' && <Chart options={chart} series={chart.series} type="area" className={'w-full'} height={335}></Chart>}
     </>
   )
 }

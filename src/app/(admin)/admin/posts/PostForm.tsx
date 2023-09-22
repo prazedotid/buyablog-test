@@ -117,7 +117,7 @@ export default function PostForm({ post, loading }: Props) {
         />
       </div>
       <div>
-        <div className="relative inline-block mb-4">
+        <div className="relative inline-block mb-6">
           {imgData && (
             <>
               <img src={imgData} alt="Preview" className="block rounded mb-3 h-full object-cover w-full"/>

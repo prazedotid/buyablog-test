@@ -15,15 +15,7 @@ import ActionCell from './ActionCell'
 import PostStatus from './PostStatus'
 import { useRouter } from 'next/navigation'
 import Modal from '@/components/Modal'
-
-export interface PaginatedData<T> {
-  data: T[]
-  meta: PaginationMeta
-}
-
-interface PaginationMeta {
-  total: number
-}
+import { PaginatedData } from '@/lib/types'
 
 interface Post {
   id: string

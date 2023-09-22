@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { TwitterIcon } from 'lucide-react'
 
-export function Footer() {
+export default function Footer() {
   return (
     <footer className="flex justify-center mt-24">
       <div className="pt-16 space-y-12">

@@ -1,33 +1,71 @@
+'use client'
+
 import React from 'react'
 
-import prisma from '@/lib/prisma'
-import ArticleCard from './ArticleCard'
+import { useSearchParams } from 'next/navigation'
+import { PaginatedData } from '@/lib/types'
+import { fetcherData } from '@/lib/swr'
 
-async function getAllPublishedPosts() {
-  return prisma.posts.findMany({
-    where: {
-      publishedAt: {
-        lt: new Date(),
-      },
-      NOT: {
-        publishedAt: null,
-      }
-    },
-    include: {
-      author: {select: {name: true}},
-      category: {select: {name: true}},
-    },
-  })
+import ArticleCard from './ArticleCard'
+import useSWRInfinite from 'swr/infinite'
+
+interface Post {
+  id: string
+  title: string
+  slug: string
+  description: string
+  imageUrl: string | null
+  author: {
+    name: string
+  }
+  category: {
+    name: string
+  }
+  views: number
+  publishedAt: string | null
+  createdAt: string
 }
 
-export default async function Home() {
-  const posts = await getAllPublishedPosts()
+export default function Home() {
+  const searchParams = useSearchParams()
+  const rowsPerPage = 5
+
+  const postsUrl = (pageIndex: number, previousPageData: Array<PaginatedData<Post>>) => {
+    if (previousPageData && !previousPageData.length) return null
+
+    const paramsObj: Record<string, any> = {
+      status: 'published',
+      limit: rowsPerPage,
+      page: pageIndex + 1,
+    }
+    if (searchParams.has('search')) paramsObj.search = searchParams.get('search')
+
+    return '/api/posts?' + new URLSearchParams(paramsObj).toString()
+  }
+  const { data = [], size, setSize, isLoading } = useSWRInfinite<Post[]>(postsUrl, fetcherData)
+
+  const posts = data ? ([] as Post[]).concat(...data) : []
+  const isLoadingMore =
+    isLoading || (size > 0 && data && typeof data[size - 1] === "undefined")
+  const isEmpty = data?.[0]?.length === 0
+  const isReachingEnd =
+    isEmpty || (data && data[data.length - 1]?.length < rowsPerPage)
 
   return (
-    <div>
-      {posts.map((post) => (
-        <ArticleCard key={post.id} post={post}/>
-      ))}
-    </div>
+    <>
+      {posts.map((post) => <ArticleCard key={post.id} post={post}/>)}
+
+      {!isReachingEnd && (
+        <button
+          className="block mt-8 mx-auto border border-gray-300 rounded px-12 py-4"
+          disabled={isLoadingMore}
+          onClick={() => setSize(size + 1)}
+        >
+          {isLoadingMore
+            ? "Loading..."
+            : "Load more"}
+        </button>
+      )}
+    </>
   )
 }

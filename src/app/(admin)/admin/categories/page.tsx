@@ -3,7 +3,7 @@
 import DataTable, { DataTableField } from '@/components/data-table/DataTable'
 import useSWR from 'swr'
 import fetcher from '@/lib/swr'
-import { PaginatedData } from '@/app/(admin)/admin/posts/page'
+import { PaginatedData } from '@/lib/types'
 
 interface Category {
   id: string

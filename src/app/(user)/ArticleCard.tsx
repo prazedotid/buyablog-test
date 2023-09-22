@@ -13,7 +13,7 @@ interface Props {
     category: {
       name: string
     }
-    publishedAt: Date | null
+    publishedAt: string | null
     imageUrl: string | null
   }
 }
@@ -37,7 +37,7 @@ export default function ArticleCard({ post, ...props }: Props) {
             <span className="mr-1">{post.author.name}</span>
             <span className="mr-1">&middot;</span>
             {post.publishedAt && <Link href={`/posts/${post.slug}`}>
-              {DateTime.fromJSDate(post.publishedAt).toFormat('MMMM dd, yyyy')}
+              {DateTime.fromISO(post.publishedAt).toFormat('MMMM dd, yyyy')}
             </Link>}
           </p>
         </div>

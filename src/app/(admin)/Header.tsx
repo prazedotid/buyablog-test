@@ -2,7 +2,7 @@ import Link from 'next/link'
 
 import { getCurrentUser } from '@/lib/session'
 import { notFound } from 'next/navigation'
-import HeaderButton from './HeaderButton'
+import HeaderButton from '../../components/HeaderButton'
 import LogoutButton from './LogoutButton'
 
 export default async function Header() {

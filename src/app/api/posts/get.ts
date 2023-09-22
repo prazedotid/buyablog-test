@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { Prisma } from '@prisma/client'
 import { DateTime } from 'luxon'
 import prisma from '@/lib/prisma'
+import { getCurrentUser } from '@/lib/session'
 
 export async function GET(req: NextRequest) {
   try {
@@ -16,6 +17,8 @@ export async function GET(req: NextRequest) {
     const pageIndex = reqPage && !isNaN(Number(reqPage)) ? Number(reqPage) - 1 : 0
     const pageSize = reqLimit && !isNaN(Number(reqLimit)) ? Number(reqLimit) : 10
 
+    let needsAuth = false
+
     // for lookup without full text search
     let categoryIdFilter: Prisma.StringFilter<'Posts'> = {}
     if (reqCategoryID) categoryIdFilter.equals = reqCategoryID
@@ -28,15 +31,27 @@ export async function GET(req: NextRequest) {
     switch (reqStatus) {
       case 'draft':
         publishedAtFilter = null
+        needsAuth = true
         break
       case 'scheduled':
         publishedAtFilter = { gt: new Date() }
         NOT.publishedAt = null
+        needsAuth = true
         break
       case 'published':
         publishedAtFilter = { lte: new Date() }
         NOT.publishedAt = null
         break
+      default:
+        needsAuth = true
+        break
+    }
+
+    if (needsAuth) {
+      const session = await getCurrentUser()
+      if (!session) {
+        return NextResponse.json('Unauthorized.', { status: 401 })
+      }
     }
 
     const createdAtFilter: Prisma.DateTimeFilter<'Posts'> = {}
@@ -104,18 +119,21 @@ export async function GET(req: NextRequest) {
     const posts = reqSearch
       ? await prisma.posts.aggregateRaw({ pipeline: rawAggregatePipeline })
       : await prisma.posts.findMany(findOptions)
-    const total = reqSearch
-      ? (
-        (
-          await prisma.posts.aggregateRaw({
-            pipeline: [
-              { $match: { $text: { $search: reqSearch } } },
-              { $count: 'total' },
-            ],
-          })
-        )[0] as Prisma.JsonObject
-      ).total
-      : await prisma.posts.count({ where: postsWhereInput })
+    let total: Prisma.JsonValue = 0
+
+    if (reqSearch) {
+      const getTotal = await prisma.posts.aggregateRaw({
+        pipeline: [
+          { $match: matchCriteria },
+          { $count: 'total' },
+        ],
+      })
+      if (getTotal && getTotal.length === 1) {
+        total = (getTotal[0] as Prisma.JsonObject).total as number
+      }
+    } else {
+      total = await prisma.posts.count({ where: postsWhereInput })
+    }
 
     return NextResponse.json({ data: posts, meta: { total } })
   } catch (error) {
