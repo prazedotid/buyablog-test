@@ -7,46 +7,23 @@ import { getCurrentUser } from '@/lib/session'
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url)
+
+    // params
     const reqSearch = searchParams.get('search')
-    const reqStatus = searchParams.get('status')
+    const reqStatus = searchParams.get('status') || 'published'
+    const reqSort = searchParams.get('sort')
     const reqCategoryID = searchParams.get('category_id')
     const reqAuthorID = searchParams.get('author_id')
     const reqPage = searchParams.get('page')
     const reqLimit = searchParams.get('limit')
+    const pubStartDate = searchParams.get('published_from')
+    const pubEndDate = searchParams.get('published_until')
 
     const pageIndex = reqPage && !isNaN(Number(reqPage)) ? Number(reqPage) - 1 : 0
     const pageSize = reqLimit && !isNaN(Number(reqLimit)) ? Number(reqLimit) : 10
 
-    let needsAuth = false
-
-    // for lookup without full text search
-    let categoryIdFilter: Prisma.StringFilter<'Posts'> = {}
-    if (reqCategoryID) categoryIdFilter.equals = reqCategoryID
-
-    let authorIdFilter: Prisma.StringFilter<'Posts'> = {}
-    if (reqAuthorID) authorIdFilter.equals = reqAuthorID
-
-    let publishedAtFilter: Prisma.DateTimeNullableFilter<'Posts'> | null = {}
-    let NOT: Prisma.PostsWhereInput = {}
-    switch (reqStatus) {
-      case 'draft':
-        publishedAtFilter = null
-        needsAuth = true
-        break
-      case 'scheduled':
-        publishedAtFilter = { gt: new Date() }
-        NOT.publishedAt = null
-        needsAuth = true
-        break
-      case 'published':
-        publishedAtFilter = { lte: new Date() }
-        NOT.publishedAt = null
-        break
-      default:
-        needsAuth = true
-        break
-    }
-
+    // non-authenticated users can only see published posts
+    let needsAuth = !reqStatus || reqStatus !== 'published'
     if (needsAuth) {
       const session = await getCurrentUser()
       if (!session) {
@@ -54,24 +31,24 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    const createdAtFilter: Prisma.DateTimeFilter<'Posts'> = {}
-    const startDate = searchParams.get('start_date')
-    const endDate = searchParams.get('end_date')
-    if (startDate) createdAtFilter.gte = DateTime.fromFormat(startDate, 'yyyy-MM-dd').toJSDate()
-    if (endDate) createdAtFilter.lte = DateTime.fromFormat(endDate, 'yyyy-MM-dd').toJSDate()
-
     // for lookup with full text search
-    const matchCriteria: Record<string, any> = { $text: { $search: reqSearch } }
+    const matchCriteria: Record<string, any> = {}
+    if (pubStartDate || pubEndDate || reqStatus) {
+      matchCriteria.$expr = {}
+      if (reqStatus === 'draft') {
+        matchCriteria.publishedAt = { ...matchCriteria.publishedAt, $eq: null }
+      } else {
+        matchCriteria.publishedAt = { ...matchCriteria.publishedAt, $ne: null }
+      }
+      if (reqStatus === 'scheduled') matchCriteria.publishedAt.$gte = { $date: new Date() }
+      if (reqStatus === 'published') matchCriteria.publishedAt.$lte = { $date: new Date() }
+
+      if (pubStartDate) matchCriteria.publishedAt.$gte = { $date: new Date(pubStartDate) }
+      if (pubEndDate) matchCriteria.publishedAt.$lte = { $date: new Date(pubEndDate) }
+    }
+    if (reqSearch) matchCriteria.$text = { $search: reqSearch }
     if (reqCategoryID) matchCriteria.categoryId = reqCategoryID
     if (reqAuthorID) matchCriteria.authorId = reqAuthorID
-
-    const postsWhereInput: Prisma.PostsWhereInput = {
-      authorId: authorIdFilter,
-      categoryId: categoryIdFilter,
-      createdAt: createdAtFilter,
-      publishedAt: publishedAtFilter,
-      NOT,
-    }
 
     const rawAggregatePipeline: Prisma.InputJsonValue[] = [
       { $match: matchCriteria },
@@ -100,39 +77,31 @@ export async function GET(req: NextRequest) {
         },
       },
     ]
+
+    const splitSort = reqSort?.split(',') ?? []
+    if (splitSort.length) {
+      const sortObj: Record<string, 1 | -1> = {}
+      for (const sortEntry of splitSort) {
+        const [col, order = 'asc'] = sortEntry.split(':')
+        sortObj[col] = order === 'asc' ? 1 : -1
+      }
+      if (Object.keys(sortObj).length > 0) rawAggregatePipeline.push({ $sort: sortObj })
+    }
     if (pageSize > -1) {
       rawAggregatePipeline.push({ $limit: pageSize }, { $skip: (pageIndex * pageSize) })
     }
 
-    // for no search query
-    const findOptions: Prisma.PostsFindManyArgs = {
-      where: postsWhereInput,
-      take: pageSize > -1 ? pageSize : undefined,
-      skip: pageSize > -1 ? (pageIndex * pageSize) : undefined,
-      include: {
-        author: { select: { name: true } },
-        category: { select: { name: true } },
-      },
-      orderBy: [{ createdAt: 'desc' }],
-    }
+    const posts = await prisma.posts.aggregateRaw({ pipeline: rawAggregatePipeline })
 
-    const posts = reqSearch
-      ? await prisma.posts.aggregateRaw({ pipeline: rawAggregatePipeline })
-      : await prisma.posts.findMany(findOptions)
-    let total: Prisma.JsonValue = 0
-
-    if (reqSearch) {
-      const getTotal = await prisma.posts.aggregateRaw({
-        pipeline: [
-          { $match: matchCriteria },
-          { $count: 'total' },
-        ],
-      })
-      if (getTotal && getTotal.length === 1) {
-        total = (getTotal[0] as Prisma.JsonObject).total as number
-      }
-    } else {
-      total = await prisma.posts.count({ where: postsWhereInput })
+    let total = 0
+    const getTotal = await prisma.posts.aggregateRaw({
+      pipeline: [
+        { $match: matchCriteria },
+        { $count: 'total' },
+      ],
+    })
+    if (getTotal && getTotal.length === 1) {
+      total = (getTotal[0] as Prisma.JsonObject).total as number
     }
 
     return NextResponse.json({ data: posts, meta: { total } })
