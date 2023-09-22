@@ -15,9 +15,11 @@ export default function Header() {
   const [isSearchOpen, setIsSearchOpen] = useState(false)
 
   function handleSearchSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
     const formData = new FormData(e.currentTarget)
 
     router.push('/?' + new URLSearchParams({ page: '1', search: formData.get('search') as string }).toString())
+    setIsSearchOpen(false)
   }
 
   return (
