@@ -9,11 +9,13 @@ interface Props {
   onSchedulePublish: () => void
   onClearAll: () => void
   isReadyToPublish: boolean
+  canSaveToDraft: boolean
 }
 
-export default function Publish({ onClearAll, onSaveAsDraft, onSchedulePublish, onPublish, isReadyToPublish }: Props) {
+export default function Publish({ onClearAll, onSaveAsDraft, onSchedulePublish, onPublish, isReadyToPublish, canSaveToDraft }: Props) {
   const publishButtonCls = clsx('px-5 py-3 text-sm bg-blue-100 rounded-bl rounded-tl text-blue-800 font-medium', !isReadyToPublish ? 'opacity-50' : 'hover:bg-blue-200')
   const scheduleButtonCls = clsx(`group flex w-full items-center rounded-md px-2 py-2 text-sm`, !isReadyToPublish && 'opacity-50')
+  const saveToDraftButtonCls = clsx(`group flex w-full items-center rounded-md px-2 py-2 text-sm`, !canSaveToDraft && 'opacity-50')
 
   return (
     <div className="flex items-center">
@@ -45,9 +47,8 @@ export default function Publish({ onClearAll, onSaveAsDraft, onSchedulePublish, 
               <Menu.Item>
                 {({ active }) => (
                   <button
-                    className={`${
-                      active ? 'bg-gray-100' : 'text-gray-900'
-                    } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                    className={clsx(active && canSaveToDraft ? 'bg-gray-100' : 'text-gray-900', saveToDraftButtonCls)}
+                    disabled={!canSaveToDraft}
                     onClick={onSaveAsDraft}
                   >
                     Save as draft

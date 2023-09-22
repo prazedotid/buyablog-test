@@ -8,6 +8,9 @@ import { ChangeEvent, useCallback, useState } from 'react'
 
 import Publish from './Publish'
 import { useRouter } from 'next/navigation'
+import useSWR from 'swr'
+import { PaginatedData } from '@/lib/types'
+import fetcher from '@/lib/swr'
 
 interface Props {
   loading?: boolean
@@ -17,7 +20,14 @@ interface Props {
     description: string
     content: string
     imageUrl: string | null
+    categoryId: string | null
+    publishedAt: Date | null
   }
+}
+
+interface Category {
+  id: string
+  name: string
 }
 
 export default function PostForm({ post, loading }: Props) {
@@ -28,6 +38,9 @@ export default function PostForm({ post, loading }: Props) {
   const [title, setTitle] = useState(post?.title ?? '')
   const [description, setDescription] = useState(post?.description ?? '')
   const [content, setContent] = useState(post?.content ?? '')
+  const [categoryId, setCategoryId] = useState(post?.categoryId ?? '')
+
+  const { data: categories } = useSWR<PaginatedData<Category>>('/api/categories', fetcher)
 
   const clearPicture = () => {
     setImgData(null)
@@ -52,13 +65,12 @@ export default function PostForm({ post, loading }: Props) {
 
   async function publishPost() {
     const body = new FormData()
-    if (featureImage) {
-      body.append('image', featureImage)
-    }
+    if (featureImage) body.append('image', featureImage)
     body.append('title', title)
     body.append('description', description)
     body.append('content', content)
     body.append('published_at', new Date().toISOString())
+    body.append('category_id', categoryId)
 
     setLoading(true)
     const url = post ? '/api/posts/' + post.id : '/api/posts'
@@ -75,6 +87,7 @@ export default function PostForm({ post, loading }: Props) {
     body.append('title', title)
     body.append('description', description)
     body.append('content', content)
+    body.append('category_id', categoryId)
 
     setLoading(true)
     const url = post ? '/api/posts/' + post.id : '/api/posts'
@@ -93,6 +106,7 @@ export default function PostForm({ post, loading }: Props) {
     setTitle('')
     setDescription('')
     setContent('')
+    setCategoryId('')
     clearPicture()
   }
 
@@ -100,16 +114,29 @@ export default function PostForm({ post, loading }: Props) {
     <div className="relative w-full max-w-6xl mx-auto pb-60">
       <div
         className={clsx('bg-white opacity-50 w-full h-full top-0 left-0 z-50', formLoading ? 'absolute' : 'hidden')}></div>
-      <div className="flex items-center justify-between mb-4">
-        <div className="-ml-4 py-3">
+      <div className="flex items-center justify-center mb-4">
+        <div className="-ml-4 py-3 mr-auto">
           <Link href="/admin/posts"
                 className="inline-flex text-sm gap-4 items-center text-gray-800 font-medium hover:underline">
             <ChevronLeftIcon size={16}/>
             <span>Back to posts</span>
           </Link>
         </div>
+        <div className="mr-3">
+          <select
+            onChange={(e) => setCategoryId(e.target.value)}
+            value={categoryId}
+            className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
+          >
+            <option value="">Choose a Category</option>
+            {categories && categories.data.map(c => (
+              <option key={c.id} value={c.id}>{c.name}</option>
+            ))}
+          </select>
+        </div>
         <Publish
-          isReadyToPublish={!!(title && description && content)}
+          isReadyToPublish={!!(title && description && content && categoryId)}
+          canSaveToDraft={!post?.publishedAt}
           onPublish={publishPost}
           onSaveAsDraft={saveAsDraft}
           onSchedulePublish={schedulePublish}
@@ -150,7 +177,7 @@ export default function PostForm({ post, loading }: Props) {
             placeholder="Post title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="w-full text-gray-900 text-6xl font-medium block focus:outline-0 resize-none leading-tighter tracking-tight"
+            className="w-full text-gray-900 text-6xl font-medium block focus:outline-0 resize-none leading-tight tracking-tight"
           />
         </div>
         <div className="w-full mb-4">
