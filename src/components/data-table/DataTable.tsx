@@ -1,7 +1,7 @@
 'use client'
 
 import clsx from 'clsx'
-import { ReactNode, useEffect, useMemo, useState } from 'react'
+import { ReactNode, useState } from 'react'
 
 import Pagination from '@/components/data-table/Pagination'
 import { noop } from '@/lib/util'
@@ -60,7 +60,7 @@ export default function DataTable<T>(props: DataTableProps<T>) {
     onPageChange = noop,
     onRowsPerPageChange = noop,
   } = props
-  const tableClassName = clsx('min-w-full divide-y divide-gray-200 rounded-lg overflow-hidden', pagination ? 'mb-3' : 'mb-6')
+  const tableClassName = clsx('min-w-full divide-y divide-gray-200 rounded-lg overflow-hidden', pagination && 'mb-3')
   const tableFields = fields.map(r => {
     if (r.sortable === undefined) {
       r.sortable = true
@@ -72,9 +72,7 @@ export default function DataTable<T>(props: DataTableProps<T>) {
   const [currentPage, setCurrentPage] = useState(() => paginationDefaultPage)
   const [rowsPerPage, setRowsPerPage] = useState(() => paginationPerPage)
 
-  const tableRows = useMemo(() => {
-    return rows
-  }, [currentPage, pagination, rowsPerPage, rows])
+  const tableRows = rows
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page)

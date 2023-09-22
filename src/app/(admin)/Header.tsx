@@ -12,8 +12,9 @@ export default async function Header() {
   }
 
   const links = [
-    {url: '/admin', name: 'Home'},
-    {url: '/admin/posts', name: 'Posts'},
+    { url: '/admin', name: 'Home' },
+    { url: '/admin/posts', name: 'Posts' },
+    { url: '/admin/categories', name: 'Categories' },
   ]
 
   return (

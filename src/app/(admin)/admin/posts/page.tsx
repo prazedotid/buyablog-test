@@ -16,7 +16,7 @@ import PostStatus from './PostStatus'
 import { useRouter } from 'next/navigation'
 import Modal from '@/components/Modal'
 
-interface PaginatedData<T> {
+export interface PaginatedData<T> {
   data: T[]
   meta: PaginationMeta
 }
@@ -31,6 +31,9 @@ interface Post {
   author: {
     name: string
   }
+  category: {
+    name: string
+  }
   views: number
   publishedAt: string | null
   createdAt: string
@@ -41,9 +44,15 @@ interface User {
   name: string
 }
 
+interface Category {
+  id: string
+  name: string
+}
+
 export default function Posts() {
   const router = useRouter()
   const [searchFilter, setSearchFilter] = useState('')
+  const [categoryFilter, setCategoryFilter] = useState('')
   const [authorFilter, setAuthorFilter] = useState('')
   const [statusFilter, setStatusFilter] = useState('')
   const [startDateFilter, setStartDateFilter] = useState<Date | null>(null)
@@ -61,6 +70,7 @@ export default function Posts() {
 
   const fields: DataTableField<Post>[] = [
     { name: 'Title', selector: p => p.title },
+    { name: 'Category', selector: p => p.category.name },
     { name: 'Author', selector: p => p.author.name },
     { name: 'Status', format: p => <PostStatus publishedAt={p.publishedAt}/> },
     { name: 'Views', selector: p => p.views.toLocaleString() },
@@ -92,15 +102,17 @@ export default function Posts() {
   const postsUrl = useMemo(() => {
     const paramsObj: Record<string, any> = { page: pageNumber, limit: rowsPerPage }
     if (debouncedSearch) paramsObj.search = debouncedSearch
+    if (categoryFilter) paramsObj.category_id = categoryFilter
     if (authorFilter) paramsObj.author_id = authorFilter
     if (statusFilter) paramsObj.status = statusFilter
     if (startDateFilter) paramsObj.start_date = DateTime.fromJSDate(startDateFilter).toFormat('yyyy-MM-dd')
     if (endDateFilter) paramsObj.end_date = DateTime.fromJSDate(endDateFilter).toFormat('yyyy-MM-dd')
 
     return '/api/posts?' + new URLSearchParams(paramsObj).toString()
-  }, [pageNumber, rowsPerPage, debouncedSearch, authorFilter, statusFilter, startDateFilter, endDateFilter])
+  }, [pageNumber, rowsPerPage, debouncedSearch, categoryFilter, authorFilter, statusFilter, startDateFilter, endDateFilter])
   const { data: posts, isLoading, mutate } = useSWR<PaginatedData<Post>>(postsUrl, fetcher)
   const { data: users } = useSWR<PaginatedData<User>>('/api/users', fetcher)
+  const { data: categories } = useSWR<PaginatedData<Category>>('/api/categories', fetcher)
 
   async function onConfirmDelete() {
     if (!toBeDeletedId) return
@@ -145,6 +157,19 @@ export default function Posts() {
               />
             </div>
             <div className="flex items-center relative">
+              <div className="mr-3 w-36">
+                <p className="text-xs uppercase mb-2 font-bold text-gray-500">Category</p>
+                <select
+                  onChange={(e) => setCategoryFilter(e.target.value)}
+                  value={categoryFilter}
+                  className="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
+                >
+                  <option value="">All</option>
+                  {categories && categories.data.map(c => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
+                </select>
+              </div>
               <div className="mr-3 w-36">
                 <p className="text-xs uppercase mb-2 font-bold text-gray-500">Author</p>
                 <select
