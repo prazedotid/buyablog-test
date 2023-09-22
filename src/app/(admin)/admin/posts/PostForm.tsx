@@ -65,7 +65,11 @@ export default function PostForm({ post, loading }: Props) {
 
   async function publishPost() {
     const body = new FormData()
-    if (featureImage) body.append('image', featureImage)
+    if (featureImage) {
+      body.append('image', featureImage)
+    } else if (post?.imageUrl) {
+      body.append('image_url', post.imageUrl)
+    }
     body.append('title', title)
     body.append('description', description)
     body.append('content', content)
@@ -83,7 +87,11 @@ export default function PostForm({ post, loading }: Props) {
 
   async function saveAsDraft() {
     const body = new FormData()
-    if (featureImage) body.append('image', featureImage)
+    if (featureImage) {
+      body.append('image', featureImage)
+    } else if (post?.imageUrl) {
+      body.append('image_url', post.imageUrl)
+    }
     body.append('title', title)
     body.append('description', description)
     body.append('content', content)

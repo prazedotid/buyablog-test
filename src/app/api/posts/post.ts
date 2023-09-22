@@ -43,7 +43,9 @@ export async function POST(
     const formData = await req.formData()
     let imageUrl: string | null = null
 
-    if (formData.has('image')) {
+    if (formData.has('image_url')) {
+      imageUrl = formData.get('image_url') as string
+    } else if (formData.has('image')) {
       const uploadToS3 = await uploadFile({
         file: formData.get('image') as File,
         bucketName: 'buyablog-post-images',

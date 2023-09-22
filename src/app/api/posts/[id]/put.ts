@@ -50,7 +50,9 @@ export async function PUT(
   const formData = await req.formData()
   let imageUrl: string | null = ''
 
-  if (formData.has('image')) {
+  if (formData.has('image_url')) {
+    imageUrl = formData.get('image_url') as string
+  } else if (formData.has('image')) {
     const img = formData.get('image')
     if (img === null) {
       imageUrl = img
